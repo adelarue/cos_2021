@@ -1,0 +1,664 @@
+---
+title: 'Session 2: Introduction to Data Wrangling'
+author: "Dan Killian and Ted Papalexopoulos"
+date: "1/12/2021"
+output: 
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: vignette
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Agenda
+
+1. The RStudio IDE  
+2. Introduction to R and R Basics 
+3. Introduction to the Tidyverse
+
+# RStudio
+
+Before we begin, let's take a moment to go through the basics of RStudio.
+
+# What is R
+
+R is a programming language for statistical computing and graphics. Initially
+introduced in 1993, the language was designed specifically for working with
+data. R's functionality is greatly enhanced by a massive repository of 
+community-built packages (also refered to as libraries) which continue to
+extend and improve R's power.
+
+# R Basics
+
+## Simple Calculator
+
+You can use R as a calculator:
+
+```{r}
+1 / 200 * 30
+(59 + 73 + 2) / 3
+sin(pi / 2)
+```
+
+## Variable Assignments
+
+You can create new objects with `<-`:
+
+```{r}
+x <- 3 * 4
+```
+
+All R statements where you create objects, __assignment__ statements, have the 
+same form:
+
+```{r eval = FALSE}
+object_name <- value
+```
+
+When reading that code say "object name gets value" in your head.
+
+Don't use `=`: it will work, but it will cause confusion later. 
+
+## Naming Convention
+
+Object names must start with a letter, and can only contain letters, numbers, 
+`_` and `.`. You want your object names to be descriptive, so you'll need a 
+convention for multiple words. __snake_case__ is the recommended choice,
+where you separate lowercase words with `_`. 
+
+```{r, eval = FALSE, echo=TRUE}
+i_use_snake_case
+```
+
+Also, capitalization matters!
+
+```{r}
+MIT_Cheer <- "Go Engineers"
+```
+
+Let's try to inspect it:
+
+```{r, eval = FALSE}
+mit_cheer
+#> Error: object 'mit_cheer' not found
+MIT_cheer
+#> Error: object 'MIT_cheer' not found
+```
+
+## Indexing Vectors and Dataframes
+
+To discuss indexing, we will use the `cars` dataframe which is a preloaded
+dataframe containing two columns: `speed` and `distance`.
+
+To access a single column of this dataframe, we use `$`. Here, we view
+the `speed` column from the `cars` dataframe.
+
+```{r echo=TRUE}
+cars$speed
+```
+
+To index a specific element(s) of a vector or dataframe, we use `[ ]`. 
+
+Here we select the first five elements of the `speed` vector.
+
+```{r echo=TRUE}
+cars$speed[1:5]
+```
+
+And here we select the first ten rows of the first column (the `speed` column) 
+of the `cars` dataframe
+
+```{r echo=TRUE}
+cars[1:10, 1]
+```
+
+Note that a vector only requires one position arguement, while a 
+dataframe requires both the row and column.
+
+## Calling Functions
+
+R has a large collection of built-in functions that are called like this:
+
+```{r eval = FALSE}
+function_name(arg1 = val1, arg2 = val2, ...)
+```
+
+## Help with Functions
+
+Oftentimes, you will need to reference the R documentation for a function.
+A quick way to do this is to use a single question mark '?' followed by the 
+function name.
+
+```{r eval = FALSE}
+?summary()
+```
+
+# Let's Get Started
+
+Now that we've covered the basics, let's jump in and start working with some
+data!
+
+## Before we Begin...
+
+Before we begin working with data, we need to make sure that R knows where to
+look for any data that we want to import and where to save any files we may 
+create. To do this, we should check the *working directory*
+
+```{r}
+getwd()
+```
+
+If the working directory is not correct, we need to *set the working directory* 
+to the \\GitHub\cos_2021\\2_data_wrangling folder. One easy to do this is in 
+the Files tab using the "More" drop-down menu.  
+
+## Initial Steps
+
+### Clear the Workspace
+
+Whenever you begin working in R, it is usually (note that I said usually and
+not always) a good idea to clear your workspace. 
+
+```{r}
+rm(list = ls())
+```
+
+### Load Packages
+
+After clearing the workspace, the general convention is to first load in
+any packages that you intend to use in your script.
+
+If you did the homework, you already installed the library we need, 
+but if not, install it with: `install.packages('tidyverse')`.
+
+Now that we have the libraries installed, we'll load them into our current 
+R session:
+
+```{r}
+library(tidyverse)
+```
+
+## Import and Explore our Data 
+
+Let's load up the AirBnB data.
+
+```{r}
+raw_listings <- read_csv('../data/listings.csv')
+```
+
+We can look in Environment and see there's actually 3,585 rows of 95 variables!
+
+To get a clearer idea of what the data encompass we can use the 'str' command.
+This command displays the structure of an object:
+
+```{r echo=TRUE}
+str(raw_listings)
+```
+
+The 'summary' command gives summary statistics
+
+```{r echo=TRUE}
+summary(raw_listings)  
+```
+
+The 'colnames' command displays just column names	
+
+```{r echo=TRUE}
+colnames(raw_listings)  
+```
+
+A useful command is `table`, which quickly cross-tabulate counts of 
+different variables.  To see the count of how many listings are 
+listed under each room type, we would type 	
+
+```{r echo=TRUE}
+table(raw_listings$room_type)	  
+```
+
+## R Data Type Error and User-Defined Functions
+
+Does anyone notice anything odd about the price column? 
+
+```{r}
+summary(raw_listings$price)
+```
+
+Don't worry if you didn't. You typically don't suspect data type errors
+until you try to do some sort of manipulation such as 
+
+```{r eval=FALSE}
+sum(raw_listings$price)
+# >Error in sum(raw_listings$price) : invalid 'type' (character) of argument
+```
+
+R is telling us that the prices are character strings and not numeric. 
+
+The prices were given the type `character` because the column contains 
+punctuation. But, we know they should be integers so we will write a 
+function to correct this.
+
+The 'function()' command allows us to create a function as an R object.
+
+We will use the 'gsub' function to replace all occurences of a pattern with 
+a new pattern.
+
+The blackslash \ helps us escape special behavior.
+
+Now we can define a function to replace all dollar signs in the price with 
+a space:
+
+```{r}
+clean_price <- function(price) as.numeric(gsub('\\$|,', '', price))
+```
+
+
+## Motivation for the Tidyverse, Example 1
+
+Even with the `summary` function, it is
+still challenging to figure out what's in this dataset. 
+
+Let's narrow our focus a little bit by just looking at two columns: 
+`neighbourhood` and `price`.
+
+To get just the first 10 rows of `raw_listings` and only the columns 
+`neighbourhood` and `price`, we can type
+
+```{r echo=TRUE}
+raw_listings[1:10, colnames(raw_listings) %in% c("neighbourhood","price")] 
+```
+
+I don't know about you but that seems like A LOT of typing to just get
+two columns! And, on top of that, this code is difficult to read!
+
+There must be a better way....
+
+## Motivation for the Tidyverse, Example 2
+
+We may wish to be a little more focused in our investigation of our data. For 
+this we can use "conditional" arguments, meaning a statement that can be
+answered by "true" or "false". For example, we may be interested in exploring
+only those rooms that accomodate 4 or more people. 
+
+To determine the count of rooms by type that accommodate >= 4 people, we 
+can type: 
+
+```{r echo=TRUE}
+table(raw_listings$room_type, raw_listings$accommodates >= 4)	 
+```
+
+As in the previous motivating example, this code gets us what we want but
+again seems kind of messy.
+
+I say again, there must be a better way!
+
+# Introduction to the Tidyverse
+
+Hadley Wickham, a statistician and computer scientist, introduced a suite of 
+packages to give an elegant, unified approach to handling data in R 
+(check out [the paper](http://vita.had.co.nz/papers/tidy-data.html)!). 
+These data analysis tools, and the philosophy of data handling that goes 
+with them, have become standard practice when using R. 	
+
+The motivating observation is that data *tidying* and *preparation* consumes a 
+majority of the data scientist's time; the underlying concept is then to 
+envision data wrangling in an idiomatic way. 
+
+To this end, Hadley developed a data cleaning philosophy and functions based
+on **verbs** and a nifty operator called the **chaining operator** which 
+looks like `%>%` and serves like a pipeline from one function to another as in: 
+`my_dataframe %>% My_Function == My_Function(my_dataframe)`.
+
+The chaining operator feeds in the object on its left as the first argument 
+into the function on its right.
+
+## Feel the Power
+
+Now that we've introduced the concept of the tidyverse, let's see just
+how powerful it can be.
+
+To start, remember this ugly subsetting code from above?
+
+```{r eval=FALSE}
+raw_listings[1:10, colnames(raw_listings) %in% c("neighbourhood","price")] 
+```
+
+Well, using the tidyverse, this becomes
+
+```{r echo=TRUE}
+raw_listings %>%
+  select(neighbourhood, price) %>%
+  head(10)
+```
+
+(Here, we've used the `head` command and the input `10` to print out the first 
+10 elements)
+
+What about that ugly table function from before?
+
+```{r eval=FALSE}
+table(raw_listings$room_type, raw_listings$accommodates >= 4)	
+```
+
+Using the tidyverse, this becomes
+
+```{r echo=TRUE}
+raw_listings %>%
+  filter(accommodates >= 4) %>%
+  select(room_type) %>%
+  table()
+```
+
+
+Isn't that so much easier?! (Please excuse my enthusiasm.)
+
+Compared to our previous example this is much easier to interpret.
+
+Why?  
+
+* It is nicely organized  
+* It aligns with the way we as humans think  
+
+## Some Tidyverse Verbs
+
+We just two tidyverse verbs. We saw how we can use:
+
+* the `select` function to, you guessed it, **select** a specific column(s)   
+* the `filter` function to **filter** our table based on a specific condition(s)  
+
+Let's look at some more verbs.
+
+The `mutate` command allows us to add new variables (and thus new columns) to 
+data, often by referring to existing ones.
+
+```{r echo=TRUE}
+raw_listings %>%
+  mutate(nprice = clean_price(price)) %>%
+  select(name, price, nprice) %>% 
+  head()
+```
+
+We can also `arrange` this info (sort it) to see the lowest- or highest-priced 
+listings:
+
+```{r echo=TRUE}
+raw_listings %>%
+  mutate(nprice = clean_price(price)) %>%
+  select(name, price, nprice) %>%
+  arrange(nprice) %>%
+  head()
+```
+
+(To see the highest-priced listings, notice the `desc()` embedded in 
+the `arrange()` command)
+
+```{r echo=TRUE}
+raw_listings %>%
+  mutate(nprice = clean_price(price)) %>%
+  select(name, price, nprice) %>%
+  arrange(desc(nprice)) %>%
+  head()
+```
+
+Note that the tidyverse packages generally do not change the dataframe objects 
+they act on. 
+
+For example, the code above doesn't change `raw_listings`, but instead returns 
+a new dataframe that has the same data as `raw_listings`, plus an extra column.
+
+To learn another verb, let's say we're interested in understanding the 
+relationship between bedrooms and price. But some of the listings don't 
+have data on bathrooms; 
+
+The `is.na()` function returns `TRUE` if something is `NA`, so `!is.na()` 
+(read: "*not* is NA") returns the opposite.
+
+The 'sum' command helps us count how many NA's there are in a column as
+the logical `TRUE/FALSE` vector created by the `is.na()` function is converted 
+to a binary numeric vector.
+
+```{r echo=TRUE}
+raw_listings %>% 
+  select(bathrooms) %>%
+  is.na() %>%
+  sum()
+```
+
+We could remove these records using
+
+```{r echo=TRUE}
+raw_listings %>% 
+  filter(!is.na(bathrooms))
+```
+
+Finally, let's combine some of these to make a clean dataset to work with. 
+
+We want to make sure our data has a correct price column and no missing bedroom 
+or bathroom columns. We'll assign it to a new dataframe named `listings`. 
+
+```{r}
+listings <- raw_listings %>%
+  filter(!is.na(bedrooms), 
+         !is.na(bathrooms)) %>%
+  mutate(nprice = clean_price(price),
+         weekly_price = clean_price(weekly_price),
+         monthly_price = clean_price(monthly_price))
+```
+
+## Aggregation
+
+Now, let's see some summary statistics, like the average price for a listing? 
+Let's take our clean dataset and `summarize` it to find out.
+ 
+```{r}
+listings %>% 
+  summarise(avg.price = mean(nprice))
+```
+
+But what if we want to group our data by the variable `neighborhood_cleansed` 
+and then calculate a mean for each individual group?
+
+We can do this using the `group_by` function.
+
+```{r}
+listings %>%
+  group_by(neighbourhood_cleansed) %>%
+  summarize(avg.price = mean(nprice))
+```
+
+Whenever we use means, it is a good idea to check for outliers.
+The `n()` function gives a count of how many rows we have in each group. 
+
+```{r}
+listings %>%
+  group_by(neighbourhood_cleansed) %>%
+  summarize(avg.price = mean(nprice),
+            med.price = median(nprice),
+            num = n())
+```
+
+We do notice some red flags to our "mean" approach.
+
+- First, if there are a very small number of listings in a neighborhood 
+compared to the rest of the dataset, we may worry we don't have a 
+representative sample, or that this data point should be
+discredited somehow (on the other hand, maybe it's just a small 
+neighborhood, like Bay Village, and it's actually outperforming expectation).
+
+- Second, if the *median* is very different than the *mean* for a particular 
+neighborhood, it indicates that we likely have *outliers* skewing the average. 
+As a rule of thumb, means tend to be a misleading statistic to use with things 
+like rent prices or incomes since outliers have such a large effect.
+
+One thing we can do is just filter out any neighborhood below a 
+threshold count:
+
+```{r}
+listings %>%
+  group_by(neighbourhood_cleansed) %>%
+  summarize(avg.price = mean(nprice),
+            med.price = median(nprice),
+            num = n()) %>%
+  filter(num > 200)
+```
+
+We can also pick a few neighborhoods to look at by using the `%in%` keyword 
+within a `filter`command with a list of the neighborhoods we want.
+We use the 'c()' function to combine its arguments in a vector.
+
+```{r}
+listings %>%
+  filter(neighbourhood_cleansed %in% c('Downtown', 
+                                       'Back Bay', 
+                                       'Chinatown')) %>%
+  group_by(neighbourhood_cleansed) %>%
+  summarize(avg.price = mean(nprice),
+            med.price = median(nprice),
+            num = n()) %>%
+  arrange(med.price)
+```
+
+We have now seen: `select`, `filter`, `count`, `summarize`, `mutate`, 
+`group_by`, and `arrange`. This is the majority of the dplyr "verbs" for 
+operating on a single data table (although [there are many more](https://cran.r-project.org/web/packages/dplyr/dplyr.pdf)), 
+but as you can see, learning new verbs is pretty intuitive. 
+What we have already gives us enough tools to accomplish a 
+large swath of data analysis tasks.
+
+# Diving Deeper into the Tidy Data Philosophy
+
+__Question:__ Consider the following data below. How many variables does this 
+dataset contain?
+
+ |Company  | Qtr.1  |  Qtr.2  |  Qtr.3  |  Qtr.4  |
+ |---------|--------|---------|---------|---------|
+ |ABC      |$134.01 |$256.77  |$1788.23 |$444.37  |
+ |XYZ      |$2727.11|$567.23  |$321.01  |$4578.99 |
+ |GGG      |$34.31  |$459.01  |$123.81  |$5767.01 |
+
+The way the table is presented, it seems like there are only two variables. 
+However, the correct answer is __3__. The variables are 
+`Company`, `Quarter` and `Earnings`. 
+
+> Raw data in the real-world is often `untidy` and poorly formatted. 
+
+## What is Tidy Data?
+
+A dataset is said to be tidy if it satisfies the following conditions
+
+1. Each variable must have its own column.  
+2. Each observation must have its own row.  
+3. Each value must have its own cell.  
+
+Sounds simple, right?  Yet a lot of data isn't formed that way, as we just 
+saw.
+
+In the tidyverse, we'd rather have the table represent "quarterly earnings," 
+with each row  containing a single observation of a single quarter for a 
+single company, and columns representing the company, quarter, and earning.  
+
+Something like this:
+
+|Company  | Quarter |  Earnings  |
+|---------|---------|------------|
+|ABC      |Qtr.1    |$134.01     |
+|ABC      |Qtr.2    |$256.77     |
+|ABC      |Qtr.3    |$1788.23    |
+|...      |...      |...         |
+
+## Why Tidy Data?
+
+Consider the first table of quarterly earning data, which we say is in a  
+**wide** format, and the second table of quarterly earning data, which we say 
+is in a **long** format. 
+
+Suppose we wanted to compare each company's earnings from the first half of the
+year to their earnings from the second half of the year.
+
+How would we do that in the first case? It'd be an ugly and manual process. 
+In the second case, we can run: 
+
+```{r eval=FALSE}
+quarterly_earnings %>%
+  mutate(Part_of_Year = ifelse(Quarter %in% c("Qtr.1","Qtr.2"),
+                               "First_Half",
+                               "Second_Half")) %>%
+  group_by(Company, Part_of_Year) %>%
+  summarise(Earnings = sum(Earnings))
+```
+
+Simply put, tidy data and the tidyverse makes it easy to carry out data 
+analysis.
+
+### Causes of Messiness
+
+- Column headers are values, not variable names 
+- Multiple variables are stored in one column 
+- Variables are stored in both rows and columns 
+- Multiple types of experimental unit stored in the same table 
+- One type of experimental unit stored in multiple tables
+
+## Pivotting Dataframes (aka Reshaping our Data)
+
+Think about our `listings` dataset. Doesn't our data have specific columns for
+daily, weekly, and monthly prices? 
+
+This is not always an issue, but can become one, especially when we try to 
+build a graph comparing the distributions of daily, weekly, and monthly prices.
+
+We have a similar situation to the quarterly earnings example from before. 
+We want each row to have single price, and have one of the columns specify 
+which kind of price we're talking about.
+
+We have **wide** data when it comes to price and we would like **long** data.
+
+You may be thinking by now, "Certainly, there must be an easy function for this
+with some sort of intuitive name such as `pivot_longer`!" and you would be 
+correct.
+
+To pivot **wide** data into a **long** format, we can use the `pivot_longer` 
+function.  
+
+```{r}
+long_price <- listings %>%
+  select(id, name, nprice, weekly_price, monthly_price) %>%
+  pivot_longer(cols = c("nprice", "weekly_price", "monthly_price"), 
+               names_to = "price_type",
+               values_to = "price_value") %>%
+  filter(!is.na(price_value))
+
+long_price %>% head()  # take a peek
+```
+
+Let's break down what `pivot_longer` does:
+
+- The first argument is the columns that we would like to combine.
+- The second argument is the name of the new column which will store the 
+column names from the columns that we are combining. 
+- The third argument is the name of the new column that will contain the 
+values from the column we are combining.
+
+
+**Quick exercise:** What's the `pivot_longer` command for the quarterly 
+earnings table above?
+*Answer:* 
+```{r eval=FALSE}
+pivot_longer(cols = c("Qtr.1", "Qtr.2", "Qtr.3", "Qtr.4")
+             names_to = "Quarter", 
+             values_to = "Earnings")
+```
+
+To pivot the data back into its original wide format, we can use `pivot_wider`. 
+
+```{r}
+pivot_wider(long_price,
+            names_from = price_type,
+            values_from = price_value) %>%
+  head()
+```
+ 
+There are lots of times we need this little "trick," so you should get comfortable with it
+
+## Joining datasets
+
