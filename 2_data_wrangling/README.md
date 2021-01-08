@@ -9,10 +9,7 @@ To ensure that you have the most current versions of all files, please fire up a
 
 Before class, it is recommended to skim through the [online session notes].
 
-We recommend you follow along in class using the `S2_script.R` and `S2_exercises.R` files, which will allow you to live-code along with the session leader and work through un-solved exercises.  
-
-It may be helpful, however, to also keep handy the `S2_script_full.R` and `S2_exercises_solved.R` files which have all code and exercise answers filled in.
-
+We recommend you follow along in class using the `S2_script.R` file, which will allow you to live-code along with the session leader and work through un-solved exercises. 
 
 ## Pre-assignment 2: Download `R` and RStudio
 
@@ -56,7 +53,7 @@ data.frame(x=rnorm(1000), y=rnorm(1000)) %>% ggplot(aes(x,y)) + geom_point()
 ```
 which should produce a cloud of points centered around the origin.
 
-**Please email a screenshot of these two outputs to Arthur (adelarue@mit.edu).**
+**Please submit screenshot of these two outputs to the Pre-Assignment 2 Page on the course Canvas page.**
 
 
 ## Additional Resources
