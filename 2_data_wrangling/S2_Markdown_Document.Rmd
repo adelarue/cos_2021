@@ -27,7 +27,7 @@ Before we begin, let's take a moment to go through the basics of RStudio.
 R is a programming language for statistical computing and graphics. Initially
 introduced in 1993, the language was designed specifically for working with
 data. R's functionality is greatly enhanced by a massive repository of 
-community-built packages (also refered to as libraries) which continue to
+community-built packages (also referred to as libraries) which continue to
 extend and improve R's power.
 
 # R Basics
@@ -47,7 +47,7 @@ sin(pi / 2)
 You can create new objects with `<-`:
 
 ```{r}
-x <- 3 * 4
+three_times_four <- 3 * 4
 ```
 
 All R statements where you create objects, __assignment__ statements, have the 
@@ -59,7 +59,10 @@ object_name <- value
 
 When reading that code say "object name gets value" in your head.
 
-Don't use `=`: it will work, but it will cause confusion later. 
+>You can also use `=` instead of the assignment arrow (in early versions of R, 
+this was not the case), however the standard convention is to use the 
+assignment arrow for assignment statements and to use `=` when passing 
+arguments inside of functions.
 
 ## Naming Convention
 
@@ -87,6 +90,53 @@ MIT_cheer
 #> Error: object 'MIT_cheer' not found
 ```
 
+## Vectors and Vectorization
+
+The primary data type in R is the vector (as in a container vector, 
+not a mathematical vector).
+
+As such, even scalars like our variable from earlier `three_time_four` are 
+actually vectors in R!
+
+```{r echo=TRUE}
+three_times_four
+is.vector(three_times_four)
+```
+
+Vectors with more than one element are created using the concatenation function
+`c()`, as in
+
+```{r echo=TRUE}
+vector_A <- c(1,2,3)
+vector_B <- c(2,4,6)
+```
+
+The following subsection is intended to provide some insight for those of you
+who may be learning R after mastering another language such as C or Python 
+without NumPy.
+
+>Because R is a vector-oriented language, functions are naturally vectorized. If
+we wanted to divide element *i* of `vector_B` by element *i* of `vector_A` for
+*i* in 1 to 3, we can simply type `vector_B/vector_A` instead of needing to do
+the following:
+
+```{r}
+B_divided_by_A <- c()
+
+for(i in 1:3){
+  B_divided_by_A[i] <- vector_B[i]/vector_A[i]
+}
+
+B_divided_by_A == (vector_B/vector_A)
+```
+
+>Another feature of R is that operations on vectors of different lengths do
+not cause an error. Instead, R recycles elements of the shorter vector until
+the shorter vector is the same length as the longer vector. 
+
+```{r}
+c(1,1) + c(4,4,4,4)
+```
 ## Indexing Vectors and Dataframes
 
 To discuss indexing, we will use the `cars` dataframe which is a preloaded
@@ -101,7 +151,8 @@ cars$speed
 
 To index a specific element(s) of a vector or dataframe, we use `[ ]`. 
 
-Here we select the first five elements of the `speed` vector.
+Here we select the first five elements of the `speed` vector. (Note that in R,
+the first element in indexed as element 1, not element 0 as in Python.)
 
 ```{r echo=TRUE}
 cars$speed[1:5]
@@ -114,7 +165,7 @@ of the `cars` dataframe
 cars[1:10, 1]
 ```
 
-Note that a vector only requires one position arguement, while a 
+Note that a vector only requires one position argument, while a 
 dataframe requires both the row and column.
 
 ## Calling Functions
@@ -233,7 +284,10 @@ sum(raw_listings$price)
 # >Error in sum(raw_listings$price) : invalid 'type' (character) of argument
 ```
 
-R is telling us that the prices are character strings and not numeric. 
+R is telling us that the prices are character strings and not numeric.
+
+Other vector types in R are `logical`, `integer`, `double`, `complex`, 
+`character`, or `raw`.
 
 The prices were given the type `character` because the column contains 
 punctuation. But, we know they should be integers so we will write a 
@@ -412,7 +466,8 @@ relationship between bedrooms and price. But some of the listings don't
 have data on bathrooms; 
 
 The `is.na()` function returns `TRUE` if something is `NA`, so `!is.na()` 
-(read: "*not* is NA") returns the opposite.
+(read: "*not* is NA") returns the opposite. (There is also a `is.nan()` 
+function.)
 
 The 'sum' command helps us count how many NA's there are in a column as
 the logical `TRUE/FALSE` vector created by the `is.na()` function is converted 
@@ -469,6 +524,25 @@ listings %>%
 
 Whenever we use means, it is a good idea to check for outliers.
 The `n()` function gives a count of how many rows we have in each group. 
+
+>**Exercise:** How would we get not only the mean, but also the median and the
+size of each group?  
+  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+  
+>*Answer:* 
 
 ```{r}
 listings %>%
@@ -640,16 +714,48 @@ column names from the columns that we are combining.
 values from the column we are combining.
 
 
-**Quick exercise:** What's the `pivot_longer` command for the quarterly 
-earnings table above?
-*Answer:* 
+>**Exercise:** What's the `pivot_longer` command for the quarterly 
+earnings table above?  
+
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+
+>*Answer:* 
 ```{r eval=FALSE}
 pivot_longer(cols = c("Qtr.1", "Qtr.2", "Qtr.3", "Qtr.4")
              names_to = "Quarter", 
              values_to = "Earnings")
 ```
+  
+>**Exercise:** How could we get `long_price` back into it's original, wide 
+format? (Hint: look at the help for `pivot_longer`.)
 
-To pivot the data back into its original wide format, we can use `pivot_wider`. 
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+|  
+
+>*Answer:* To pivot the data back into its original wide format, we can use `pivot_wider`. 
 
 ```{r}
 pivot_wider(long_price,
@@ -658,7 +764,160 @@ pivot_wider(long_price,
   head()
 ```
  
-There are lots of times we need this little "trick," so you should get comfortable with it
+There are lots of times we need this little "trick," so you should get 
+comfortable with it
 
 ## Joining datasets
 
+Our last topic will be how to **join** two data frames together.  
+We'll introduce the concept with two toy data frames, then apply it to our 
+AirBnB data.
+
+### Join together, right now, over me...
+
+(The following example adapted from 
+[here](https://rpubs.com/bradleyboehmke/data_wrangling).) 
+
+Let's say `table1` is
+```{r echo=FALSE}
+table1 = data.frame(name=c('Paul', 'John', 'George', 'Ringo'),
+                    instrument=c('Bass', 'Guitar', 'Guitar', 'Drums'),
+                    stringsAsFactors=F)
+table1
+```
+
+and `table2` is
+
+```{r echo=FALSE}
+table2 = data.frame(name=c('John', 'George', 'Jimi', 'Ringo', 'Sting'),
+                    member=c('yes', 'yes', 'no', 'yes', 'no'),
+                    stringsAsFactors=F)
+table2
+```
+
+
+We might want to join these datasets so that we have a `name`, `instrument`, 
+and `member` column, and the correct information filled in from both tables 
+(with NAs  wherever we're missing the info).  This operation is called a 
+`full_join` and would give us this:
+
+```{r}
+full_join(table1, table2, by='name')
+```
+
+Notice we have to specify a **key** column to join `by`, in this case `name`.
+
+We might also want to make sure we keep all the rows from the first table 
+(the "left" table) but only add rows from the second ("right") table if they 
+match existing ones from the first.  This called a `left_join` and gives us
+
+```{r}
+left_join(table1, table2, by='name')
+```
+
+since "Jimi" and "Sting" don't appear in the `name` column of `table1`.
+
+Left and full joins are both called "outer joins" (you might think of merging 
+two circles of a Venn diagram, and keeping all the non-intersecting "outer" 
+parts). However, we might want to use only rows whose key values occur in both 
+tables (the intersecting "inner" parts) --- this is called an `inner_join` and 
+gives us
+
+```{r}
+inner_join(table1, table2, by='name')
+```
+
+There is also `semi_join`, `anti_join`, ways to handle coercion, ways to handle 
+different column names ... 
+
+we don't have time to cover all the variations here, but let's try using 
+some basic concepts on our AirBnB data.
+
+### Applying joins
+
+Let's say we have a tidy table of the number of bathrooms and bedrooms for each 
+listing, which we get by doing
+
+```{r}
+rooms <- listings %>%
+  select(name, bathrooms, bedrooms) %>%
+  pivot_longer(cols = c("bathrooms","bedrooms"), 
+               names_to = "room_type",
+               values_to = "number")
+```
+
+But we may also want to look at the distribution of daily prices, 
+which we can store as
+
+```{r}
+prices <- listings %>%
+  select(name, nprice) %>%
+  mutate(price = as.numeric(gsub('\\$|,', '', nprice)))
+```
+
+Now, we can do a full join to add a `price` column.
+
+```{r}
+rooms_prices <- full_join(rooms, prices, by='name')
+```
+
+This gives us a table with the number of bed/bathrooms separated out in a tidy 
+format (so it is amenable to ggplot), but also prices tacked on each row 
+(so we can incorporate that into the visualization). 
+
+Let's try a boxplot of price, by number of rooms, and use 
+facets to separate out the two different types of room.  
+(We will also filter out half-rooms just to help clean up the plot.)
+
+```{r}
+rooms_prices %>%
+  filter(!is.na(number), number %% 1 == 0) %>%
+  mutate(number = as.factor(number)) %>%
+  ggplot(aes(x = number, 
+             y = price, 
+             fill = room_type)) +
+  geom_boxplot() +
+  facet_grid(~room_type) +
+  labs(x = '# of Rooms', 
+       y = 'Daily price', 
+       fill = 'Room type')
+```
+
+This allows us to easily use the `room_type` column 
+(created in the pivot_longer command before) to set our fill color and 
+facet layout, but still have access to all the price information from the 
+original dataset.  This visualization shows us that there is a trend of 
+increasing price with increasing number of bathrooms and bedrooms, but it is 
+not a strict one, and seems to taper off at around 2 bedrooms for example.
+
+# Conclusion 
+In this session, we introduced some basics of data wrangling and visualization in R.  
+Specifically, we introduced the powerful framework of the "Tidyverse", 
+discussed some of the elegant data philosophy behind these 
+libraries, and briefly covered some more involved operations 
+like pivot_wider/pivot_longer and dataset joins..
+
+## Further reading
+
+The best way to learn R, and data analysis in general, is not to read blogs and 
+papers, but to *get out there and do it*.  
+
+There are always intriguing competitions on data hosting websites like
+[Kaggle](http://www.kaggle.com), 
+and there many areas like [sports analytics](http://www.footballoutsiders.com), 
+[political forecasting](http://www.electoral-vote.com/evp2016/Info/data.html), 
+[historical analysis](https://t.co/3WCaDxGnJR), 
+and countless others that have [clean](http://http://www.pro-football-reference.com/), 
+[open](http://www.kdnuggets.com/datasets/index.html), and interesting data just 
+waiting for you to `read_csv`.  
+
+You don't need proprietary data [to make headlines](http://fivethirtyeight.com/features/a-plagiarism-scandal-is-unfolding-in-the-crossword-world/),
+and some data that seems like it would be hard to get is actually [out there in the wild](https://www.kaggle.com/kaggle/hillary-clinton-emails).
+
+These are hobbyist applications, but we also hope this session has sparked your
+interest in applying analytics to your own research.  Nearly every modern 
+research field has been touched by the power and pervasiveness of data, and 
+having the tools to take advantage of this in your field is a skill with 
+increasing value.
+
+And plus, it's pretty fun.
