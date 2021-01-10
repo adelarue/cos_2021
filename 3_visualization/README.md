@@ -1,33 +1,35 @@
----
-title: "COS 2021, Session 3"
-output: html_document
----
+# Visualization with R and Shiny
+
+In this session we will focus on visualization, first learning how to use
+`ggplot` to create beautiful plots, and then `shiny` to incorporate our
+analyses in an interactive web application -- all through RStudio! On the 
+way, we'll pick up some more cool tricks for data wrangling with the 
+`tidyverse`.
 
 ## Pre-Assignment
 
-#### 0. Installing Packages
 
+#### 0. Installing Libraries
 
 Make sure you have installed packages `tidyverse`, `shiny`, `leaflet`, `DT`. 
 You can install them using: 
 
-```{r eval = FALSE}
+```
 install.packages(c("tidyverse", "shiny", "leaflet", "DT"))
 ```
-
-*You might be warned that some packages will be installed from 
-binaries. Just click yes.*
+*You might be warned that some packages will have to be installed from 
+binaries. Do it.*
 
 Make sure you can load the libraries without an error in RStudio:
 
-```{r eval = FALSE}
+```
 library(shiny)
 library(DT)
 library(tidyverse)
 library(leaflet)
 ```
 
-#### 1. Make a Shiny App
+#### 1. Make your first Shiny App
 
 Follow these instructions to create a simple interactive web app, all through RStudio: 
 
@@ -41,7 +43,7 @@ Voila! You now have your first Shiny app.
 
 If you don't understand the code, don't worry. We'll dive right into this dark magic during the session.
 
-#### 2. Upload Screenshot
+#### 2. Upload a screenshot to Canvas
 
 1. Change the `Number of bins` slider to 10, and take a screenshot the histogram plot.
 2. Upload the image to Canvas.
