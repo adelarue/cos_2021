@@ -16,7 +16,8 @@ ui <- fluidPage(
             selectInput("neighb", 
                         "Neighbourhood", 
                         choices=sort(unique(listings$neighbourhood_cleansed)), 
-                        selected="Beacon Hill"),
+                        selected="Beacon Hill", 
+                        multiple=TRUE),
             sliderInput("price", "Price", min = 0, max = 300, value = c(0, 150))
         ),
         mainPanel(
