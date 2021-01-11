@@ -116,8 +116,9 @@ listings %>%
     select(id, neighbourhood, price, delta_price) %>% 
     tail
 
+
 #' ---------------------------------------------------------------------
-#' The grammar of graphics
+#' The Grammar of Graphics
 #' ---------------------------------------------------------------------
 #' Every ggplot should at the very least contain three elements: 
 #'    *Data*: a dataframe
@@ -153,7 +154,8 @@ by_bedroom_rating %>%
 #' broken out by the number of bedrooms. Let's add it as 
 #' the `color` aesthetic:
 by_bedroom_rating %>% 
-    ggplot(aes(x = rating, y = med_price, 
+    ggplot(aes(x = rating, 
+               y = med_price, 
                color = factor(bedrooms))) + 
     geom_point()
 
@@ -168,6 +170,7 @@ by_bedroom_rating %>%
                color = factor(bedrooms))) + 
     geom_point() + 
     geom_smooth(method = lm)
+
 
 #' Note that the aesthetics (x, y, color) propagate through 
 #' both geoms (point and smooth). You can also provide 
@@ -185,33 +188,34 @@ by_bedroom_rating %>%
 #' ---------------------------------------------------------------------
 #' More geometries and themes
 #' ---------------------------------------------------------------------
-#' Let's try to plot the median price by neighbourhood.
+#' Let's try to plot the median price by neighbourhood. Get the data...
 by_neighbour = listings %>% 
     group_by(neighbourhood) %>% 
     summarise(med_price = median(price))
 
 
-#' We can make a bar plot with `geom_bar()`:
+#' And make a bar plot with `geom_bar()`:
 by_neighbour %>%
     ggplot(aes(x = neighbourhood, y = med_price)) +
     geom_bar(stat = 'identity')
 
-#' We use stat="identity" to tell `geom_bar()` we want the height
-#' of the bar to be the `y` value (*identity* as in "same as"). 
-#' If there were multiple `y`'s per `x` in the data, we could have 
-#' specified an aggregation function like `mean`.
+#' We use `stat='identity'` to tell `geom_bar()` we want the height
+#' of the bar to be the `y` value (*identity* as in "same as"). This
+#' is fine because `by_neighbour` has one row per `neighbourhood`.
+#' We'll see a different example of that in a bit.
 
 
-#' The x-axis is horribly overlapping. We can easily rotate and 
-#' align it by changing the `theme()`, which takes care of
-#' non-aesthetic appearance stuff:
+#' For now, the x-axis looks horrible. Let's use `theme()` to 
+#' change thematic (i.e. non-aesthetic) appearance stuff, e.g.
+#' text rotation:
 by_neighbour %>%
-    ggplot(aes(x = neighbourhood, y = med_price)) +
+    ggplot(aes(x = neighbourhood, 
+               y = med_price)) +
     geom_bar(stat = 'identity') +
     theme(axis.text.x = element_text(angle=60, hjust=1)) 
 
 
-#' Now let's follow through on this idea and clean up a bit more: 
+#' Following through on this idea, let's clean up a bit more: 
 by_neighbour %>%
     ggplot(aes(x = reorder(neighbourhood, desc(med_price)), 
                y = med_price)) +
@@ -221,6 +225,16 @@ by_neighbour %>%
 
 #' The only new tool here is `reorder()`, which simply reorders 
 #' the first argument (`neighbourhood`) by the second (descending `price`).
+
+
+#' And finally, let's look at an example `geom_bar()` using aggregation:
+listings %>% 
+    ggplot(aes(x = bedrooms, y = price)) + 
+    geom_bar(stat = "summary", fun = median) + 
+    labs(x = "# of Bedrooms", y = "Median Price ($)")
+
+#' All we do is specify `stat='summary'`, and provide
+#' the aggregation function as `fun=median`.
 
 #' ---------------------------------------------------------------------
 #' Facetting
@@ -250,3 +264,32 @@ listings %>%
     labs(x='Price', y='Frac. of Listings', fill='Room type') +
     facet_grid(room_type~cancellation_policy) 
 
+
+#' ---------------------------------------------------------------------
+#' Conclusion
+#' ---------------------------------------------------------------------
+#' This is only a sliver of what you can do with `ggplot`. Any 
+#' plot you want to make, you can do it (or ask Google). But
+#' as a general tip, the high-level process is:
+#'    1) Decide what *geometry* is appropriate
+#'    2) Look at documentation to figure out what *aesthetics*
+#'       you need for it.
+#'    3) Use `tidyverse` to wrangle your *data* so that columns
+#'       correspond to those aesthetics (e.g. convert long/wide, summarise)
+#'    4) Add *theme* elements (e.g. labels, text)
+#' 
+#' Pointers to some things we didn't get to:
+#'    - Compare distributions with `geom_boxplot()`, `geom_violin()`
+#'    - Use `geom_text()` and the `label` to add floating text
+#'    - Add error bars with `geom_errorbar()` and `geom_errorbarh()`
+#'    - Overlay contour plots on `geom_point()` with `geom_density_2d()`
+#'    - Plot cumulative distributions with `stat_ecdf()` 
+#'    - 2d-histograms (a.k.a. color-maps) with `geom_tile()`
+#'    - QQ-plots (for checking how normal something is) with `stat_qq()`
+#'    - Change axis scales, e.g. to percentage with
+#'      `+ scale_x_continuous(labels = scales::percent())`
+#'    - Add `+ coord_flip()` to flip x and y variables (e.g. for
+#'      horizontal bar charts).
+#' 
+#' And many many many more... A pretty extensive list can be found at:
+#' http://www.sthda.com/english/wiki/be-awesome-in-ggplot2-a-practical-guide-to-be-highly-effective-r-software-and-data-visualization
