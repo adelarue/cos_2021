@@ -5,11 +5,18 @@ library(tidyverse)
 library(leaflet)
 
 listings = read_csv('../data/listings_2019.csv') %>% 
-    mutate(price = parse_number(price))
+    mutate(price = parse_number(price),
+           rating = review_scores_rating, 
+           neighbourhood = neighbourhood_cleansed)
+
+#' Exercises: 
+#'   1) Add an input: two-end slider to filter price.
+#'   2) Add two outputs: a histogram of rating and the dataframe of listings.
+#'   3) Change the appearance so that each output appears in a different tab.
 
 #' User Interface. 
 ui <- fluidPage(
-    theme = shinythemes::shinytheme("flatly"),
+    theme = shinythemes::shinytheme("superhero"),
     titlePanel("Boston AirBnB"),
     sidebarLayout(
         sidebarPanel(
@@ -53,8 +60,7 @@ server <- function(input, output, session) {
         selected_listings() %>% 
             ggplot(aes(x = review_scores_rating)) + 
             geom_histogram() + 
-            labs(x = "Review Score", y = "# Listings") + 
-            theme_bw()
+            labs(x = "Review Score", y = "# Listings")
             
     })
     

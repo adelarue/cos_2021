@@ -1,5 +1,5 @@
 #' ---------------------------------------------------------------------
-#' Visualization in R
+#' *Visualization in R*
 #' By Ted Papalexopoulos and Dan Killian 
 #' 
 #' Prior to running any code, you probably want to
@@ -13,10 +13,10 @@
 #' the `price` column as last time.
 library(tidyverse)
 
-listings <- read_csv('../data/listings.csv') %>% 
-            mutate(price = parse_number(price),
-                   rating = review_scores_rating, 
-                   neighbourhood = neighbourhood_cleansed)
+listings = read_csv('../data/listings.csv') %>% 
+           mutate(price = parse_number(price),
+                  rating = review_scores_rating, 
+                  neighbourhood = neighbourhood_cleansed)
 
 #' Instead of defining our own function `clean_price`, we use
 #' the awesome `parse_number()` function to remove `$` and `,`.
@@ -116,6 +116,23 @@ listings %>%
     select(id, neighbourhood, price, delta_price) %>% 
     tail
 
+#' Side note: `group_by() %>% mutate()`, combined with the `lag()/lead()`
+#' function are very useful when dealing with time series data; e.g.
+#' calculating the difference of sales from one day to the next.
+
+#' ---------------------------------------------------------------------
+#' `dplyr` Concluding Remarks
+#' ---------------------------------------------------------------------
+#' We have by no means exhausted the capabilities of `dplyr`. Some
+#' things we didn't cover:
+#'   - Specifying variables by name patterns with selection helpers,
+#'     `select(starts_with("Qtr"))`
+#'   - Scoped verbs, for mutating/filtering/summarising multiple
+#'     variables at the same time, e.g. `summarise_all(mean)` or
+#'     `mutate_if(is.numeric, replace_na, 0)`.
+#'   - Using the `!!sym(col_name)` to transform columns given as 
+#'     strings (useful, for example, if the variable you want to
+#'     summarise was passed as a string).
 
 #' ---------------------------------------------------------------------
 #' The Grammar of Graphics
@@ -265,18 +282,25 @@ listings %>%
     facet_grid(room_type~cancellation_policy) 
 
 
+#' Side note: facetting is a case where having *long* data 
+#' makes your life infinitely easier. Consider the company 
+#' earnings example from last time, and think how you would
+#' make histograms of earnings for each quarter separately:
+#' with wide data it would be a manual ugly process, whereas
+#' with long data a simple `+ facet_wrap(~Qtr)` works like 
+#' a charm.
+
+
 #' ---------------------------------------------------------------------
-#' Conclusion
+#' `ggplot` Concluding Remarks
 #' ---------------------------------------------------------------------
-#' This is only a sliver of what you can do with `ggplot`. Any 
-#' plot you want to make, you can do it (or ask Google). But
-#' as a general tip, the high-level process is:
-#'    1) Decide what *geometry* is appropriate
-#'    2) Look at documentation to figure out what *aesthetics*
-#'       you need for it.
-#'    3) Use `tidyverse` to wrangle your *data* so that columns
-#'       correspond to those aesthetics (e.g. convert long/wide, summarise)
-#'    4) Add *theme* elements (e.g. labels, text)
+#' Once again, we've only skimmed the surface of `ggplot`. As a 
+#' general tip, the high-level process is:
+#'    1) Decide what *geometry* is appropriate for your plot.
+#'    2) Look at documentation to find what *aesthetics* it uses.
+#'    3) Use `tidyverse` to wrangle your *data* so that columns 
+#'       correspond to those aesthetics (e.g. convert long/wide).
+#'    4) Fix it up with *theme* elements (labels, text).
 #' 
 #' Pointers to some things we didn't get to:
 #'    - Compare distributions with `geom_boxplot()`, `geom_violin()`
@@ -286,7 +310,7 @@ listings %>%
 #'    - Plot cumulative distributions with `stat_ecdf()` 
 #'    - 2d-histograms (a.k.a. color-maps) with `geom_tile()`
 #'    - QQ-plots (for checking how normal something is) with `stat_qq()`
-#'    - Change axis scales, e.g. to percentage with
+#'    - Change axis scales, e.g. to percentage or log with
 #'      `+ scale_x_continuous(labels = scales::percent())`
 #'    - Add `+ coord_flip()` to flip x and y variables (e.g. for
 #'      horizontal bar charts).
