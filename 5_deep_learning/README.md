@@ -5,6 +5,8 @@ I am looking forward to (re)introducing you to Deep Learning (DL)!
 The program I prepared for you is dense so that it can benefit each one of you, whether you know nothing about neural networks, or eat ResNets for breakfast!
 No prior knowledge in DL will be assumed.
 
+### Slides are here: https://www.dropbox.com/s/62e2ae0traqbkk2/Intro_to_Deep_Learning.pdf?dl=0
+
 The session will be organised in four parts of 30 minutes each, the last one being optional:
 
 ### Part 1: Fundamentals of Deep Learning 
