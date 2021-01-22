@@ -61,31 +61,26 @@ Though notebooks rely on your browser to work, they do not require an internet c
 
 ### Get comfortable with the notebook
 Notebooks are designed to not be fragile. If you try to close a notebook with unsaved changes, the browser will warn you.
-
 Try the following exercises:
 
-[Exercise]: Close/open
+#### Close/open
 1. Save the notebook
 2. Copy the address
 3. Close the tab
 4. Paste the address into a new tab (or re-open the last closed tab with Ctrl+Shift+T on Chrome)
-
 *The document is still there, and the Julia kernel is still alive! Nothing is lost.*
 
-[Exercise]: Zoom
+#### Zoom
 Try changing the magnification of the web page (Ctrl+, Ctrl- on Chrome).
-
 *Text and math scale well (so do graphics if you use an SVG or PDF backend).*
 
-[Exercise]: MathJax
-
+#### MathJax
 1. Create a new cell, and select the type Markdown (or press m)
 2. Type an opening \$, your favorite mathematical expression, and a closing \$.
 3. Run the cell to render the $\LaTeX$ expression.
 4. Right-click the rendered expression.
 
-[Exercise]: REPL shortcuts
-
+#### REPL shortcuts
 1. Create a new cell
 2. Experiment with typing `\pi`, `\approx`, `\alpha` and press your Tab key to
    autocomplete into special characters, see what values are returned
