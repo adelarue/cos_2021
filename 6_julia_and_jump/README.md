@@ -135,6 +135,7 @@ Run `] add <package name>` to add the following packages:
 
 Run `using <package name>` in the Julia REPL (e.g. `using JuMP`) to test
 there are no errors with the packages you added.
+Upload a screenshot of the output.
 
 ## Questions?
 Email lyna@mit.edu or lkap@mit.edu
