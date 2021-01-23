@@ -68,10 +68,12 @@ Try the following exercises:
 2. Copy the address
 3. Close the tab
 4. Paste the address into a new tab (or re-open the last closed tab with Ctrl+Shift+T on Chrome)
+
 *The document is still there, and the Julia kernel is still alive! Nothing is lost.*
 
 #### Zoom
 Try changing the magnification of the web page (Ctrl+, Ctrl- on Chrome).
+
 *Text and math scale well (so do graphics if you use an SVG or PDF backend).*
 
 #### MathJax
