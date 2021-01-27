@@ -137,5 +137,13 @@ Run `using <package name>` in the Julia REPL (e.g. `using JuMP`) to test
 there are no errors with the packages you added.
 Upload a screenshot of the output.
 
+## Other packages for use on session 7 Advanced optimization in JuMP:
+In addition to the installation instructions from the previous session, we will use the following packages:
+
+1. LinearAlgebra
+2. Test
+
+No screenshot need to be submitted on Canvas for this pre-assignment.
+
 ## Questions?
 Email lyna@mit.edu or lkap@mit.edu
