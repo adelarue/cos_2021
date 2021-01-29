@@ -1,3 +1,5 @@
+# Session 8 - The engaging cluster
+
 Because this session is technically held after the end of IAP, the pre-assignment is OPTIONAL and there is nothing to turn in on Canvas.
 
 This final session is specifically targeted at students affiliated with Sloan or the ORC, who have access to the Engaging cluster. If you are not affiliated with either organization, you will not be able to live-code along during the session, but the session is designed so you can follow along anyway, and the topics we cover generalize to the use of many computing clusters.
