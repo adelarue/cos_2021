@@ -2,7 +2,7 @@
 using JLD2, Plots, DataFrames
 
 # Load the parameters data frame
-
+@load "params.jld2" params
 
 # Create empty arrays that will hold the R2 values
 R2_train = []
